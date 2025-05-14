@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gráfica cúbica interactiva</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<body>
+    <h2>Gráfica de f(t) = -0.5t³ + 3t² + 2t + 5</h2>
+    <div id="grafica" style="width: 100%; max-width: 800px; height: 500px;"></div>
+
+    <script>
+        // Función cúbica
+        function f(t) {
+            return -0.5 * Math.pow(t, 3) + 3 * Math.pow(t, 2) + 2 * t + 5;
+        }
+
+        // Primera derivada: f'(t) = -1.5t² + 6t + 2
+        function derivada(t) {
+            return -1.5 * Math.pow(t, 2) + 6 * t + 2;
+        }
+
+        // Segunda derivada: f''(t) = -3t + 6
+        function segundaDerivada(t) {
+            return -3 * t + 6;
+        }
+
+        // Generar puntos para la gráfica
+        const x = [];
+        const y = [];
+        for (let t = -2; t <= 7; t += 0.01) {
+            x.push(t);
+            y.push(f(t));
+        }
+
+        // Calcular extremos (raíces de la derivada)
+        function puntosCriticos() {
+            const a = -1.5, b = 6, c = 2;
+            const D = b ** 2 - 4 * a * c;
+            const t1 = (-b + Math.sqrt(D)) / (2 * a);
+            const t2 = (-b - Math.sqrt(D)) / (2 * a);
+            return [t1, t2].map(t => ({ t, y: f(t), tipo: segundaDerivada(t) > 0 ? "Mínimo" : "Máximo" }));
+        }
+
+        // Punto de inflexión: f''(t) = 0
+        function puntoInflexion() {
+            const t = 2;
+            return { t, y: f(t) };
+        }
+
+        const extremos = puntosCriticos();
+        const inflexion = puntoInflexion();
+
+        const traceFuncion = {
+            x: x,
+            y: y,
+            mode: 'lines',
+            name: 'f(t)',
+            line: { color: 'blue' }
+        };
+
+        const traceExtremos = {
+            x: extremos.map(p => p.t),
+            y: extremos.map(p => p.y),
+            mode: 'markers+text',
+            name: 'Máximo/Mínimo',
+            marker: { size: 10, color: extremos.map(p => p.tipo === "Máximo" ? 'red' : 'green') },
+            text: extremos.map(p => `${p.tipo}<br>(${p.t.toFixed(2)}, ${p.y.toFixed(2)})`),
+            textposition: 'top center'
+        };
+
+        const traceInflexion = {
+            x: [inflexion.t],
+            y: [inflexion.y],
+            mode: 'markers+text',
+            name: 'Inflexión',
+            marker: { size: 10, color: 'purple' },
+            text: [`Inflexión<br>(${inflexion.t.toFixed(2)}, ${inflexion.y.toFixed(2)})`],
+            textposition: 'top center'
+        };
+
+        const layout = {
+            title: 'Gráfica de f(t) = -0.5t³ + 3t² + 2t + 5',
+            xaxis: { title: 't' },
+            yaxis: { title: 'f(t)' },
+            showlegend: true
+        };
+
+        Plotly.newPlot('grafica', [traceFuncion, traceExtremos, traceInflexion], layout);
+    </script>
+</body>
+
+</html>
+
+</html>
